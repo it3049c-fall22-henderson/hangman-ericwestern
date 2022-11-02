@@ -6,6 +6,12 @@ class Hangman {
 
     this.canvas = _canvas;
     this.ctx = this.canvas.getContext(`2d`);
+    this.word = [];
+    this.wordPlaceHolder = []
+    this.guesses = [];
+    this.isOver = false;
+    this.didWin = false;
+    this.wrongGuesses = 0;
   }
 
   /**
@@ -37,6 +43,19 @@ class Hangman {
     // reset this.guesses to empty array
     // reset this.isOver to false
     // reset this.didWin to false
+    
+    this.word = "";
+    this.wordPlaceHolder = [];
+    this.word = 'hello'.split('');
+    this.word.forEach(c => {
+      console.log(c);
+      this.wordPlaceHolder.push('_');
+    });
+    this.clearCanvas();
+    this.drawBase();
+    this.guesses = [];
+    this.isOver = false;
+    this.didWin = false;
   }
 
   /**
@@ -53,11 +72,48 @@ class Hangman {
     // check if the word includes the guessed letter:
     //    if it's is call checkWin()
     //    if it's not call onWrongGuess()
+
+    if (letter.length !== 1) {
+      alert('Guesses should be one letter and one letter only.')
+      return;
+    }
+
+    if (!(/[a-zA-Z]/).test(letter)) {
+      alert('Guesses should be only letters, no numbers, symbols, etc.')
+      return;
+    }
+
+    letter = letter.toLocaleLowerCase();
+
+    if (this.guesses.includes(letter)) {
+      alert('That letter has already been guessed.');
+      return;
+    }
+
+    this.guesses.push(letter);
+
+    if (this.word.includes(letter)) {
+      //for loop and if found at that index, change placeholder char at that index
+      for (let i = 0; i < this.word.length; i++) {
+        if (this.word[i] === letter) {
+          this.wordPlaceHolder[i] = letter;
+        }
+      }
+
+      this.checkWin();
+    } else {
+      this.onWrongGuess();
+    }
   }
 
   checkWin() {
     // using the word and the guesses array, figure out how many remaining unknowns.
     // if zero, set both didWin, and isOver to true
+    if (this.wordPlaceHolder.includes('_'))
+      return;
+    
+    this.isOver = true;
+    this.didWin = true;
   }
 
   /**
@@ -65,7 +121,38 @@ class Hangman {
    * drawHead, drawBody, drawRightArm, drawLeftArm, drawRightLeg, or drawLeftLeg.
    * if the number wrong guesses is 6, then also set isOver to true and didWin to false.
    */
-  onWrongGuess() {}
+  onWrongGuess() {
+    switch(this.wrongGuesses) {
+      case 0:
+        this.drawHead();
+        break;
+
+      case 1:
+        this.drawBody();
+        break;
+
+      case 2:
+        this.drawLeftArm();
+        break;
+
+      case 3:
+        this.drawRightArm();
+        break;
+
+      case 4:
+        this.drawLeftLeg();
+        break;
+
+      case 5:
+        this.drawRightLeg();
+        break;
+    }
+    if (this.wrongGuesses >= 5) {
+      this.isOver = true;
+    }
+
+    this.wrongGuesses++;
+  }
 
   /**
    * This function will return a string of the word placeholder
@@ -73,7 +160,7 @@ class Hangman {
    * i.e.: if the word is BOOK, and the letter O has been guessed, this would return _ O O _
    */
   getWordHolderText() {
-    return;
+    return this.wordPlaceHolder.join(' ');
   }
 
   /**
@@ -83,7 +170,7 @@ class Hangman {
    * Hint: use the Array.prototype.join method.
    */
   getGuessesText() {
-    return ``;
+    return this.guesses.join(' ');
   }
 
   /**
@@ -103,15 +190,44 @@ class Hangman {
     this.ctx.fillRect(10, 410, 175, 10); // Base
   }
 
-  drawHead() {}
+  drawHead() {
+    this.ctx.beginPath();
+    this.ctx.arc(250, 110, 50, 0, Math.PI * 2, true);
+    this.ctx.stroke();
+  }
 
-  drawBody() {}
+  drawBody() {
+    this.ctx.beginPath();
+    this.ctx.moveTo(250, 160);
+    this.ctx.lineTo(250, 290);
+    this.ctx.stroke();
+  }
 
-  drawLeftArm() {}
+  drawLeftArm() {
+    this.ctx.beginPath();
+    this.ctx.moveTo(250, 180);
+    this.ctx.lineTo(175, 220);
+    this.ctx.stroke();
+  }
 
-  drawRightArm() {}
+  drawRightArm() {
+    this.ctx.beginPath();
+    this.ctx.moveTo(250, 180);
+    this.ctx.lineTo(325, 220);
+    this.ctx.stroke();
+  }
 
-  drawLeftLeg() {}
+  drawLeftLeg() {
+    this.ctx.beginPath();
+    this.ctx.moveTo(250, 290);
+    this.ctx.lineTo(190, 380);
+    this.ctx.stroke();
+  }
 
-  drawRightLeg() {}
+  drawRightLeg() {
+    this.ctx.beginPath();
+    this.ctx.moveTo(250, 290);
+    this.ctx.lineTo(310, 380);
+    this.ctx.stroke();
+  }
 }
